@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Chúc Mừng Sinh Nhật Bố Yêu 🎉</title> 
+    <style>
+        /* --- CSS NỀN VÀ TRANG TRÍ --- */
+        body {
+            /* Đổi tông màu ấm áp, nam tính hơn (xanh dương/xanh lá/vàng) */
+            font-family: 'Times New Roman', Times, serif;
+            /* Tông màu xanh dương/vàng ấm áp */
+            background: linear-gradient(to right top, #e3f2fd, #bbdefb, #64b5f6); 
+            color: #1a237e;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            opacity: 0; 
+            transition: opacity 2s;
+        }
+
+        h1 {
+            color: #0d47a1; /* Màu xanh đậm */
+            font-size: 2.5em;
+            text-shadow: 1px 1px 3px #90caf9;
+            margin-bottom: 20px;
+        }
+
+        /* --- PHẦN HỎI NHẠC --- */
+        #music-question {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #1e88e5; /* Đổi màu viền */
+            border-radius: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #btn-yes { background-color: #42a5f5; color: white; } /* Xanh dương */
+        #btn-yes:hover { background-color: #1e88e5; }
+        #btn-no { background-color: #bbdefb; color: #1a237e; } /* Xanh nhạt */
+        #btn-no:hover { background-color: #90caf9; }
+
+        #content { display: none; }
+
+        /* Khung chữ nhật cho thư */
+        #letter-box {
+            background-color: #e3f2fd; /* Màu nền thư thay đổi */
+            border: 1px solid #90caf9;
+            padding: 25px;
+            text-align: left;
+            border-radius: 10px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+            min-height: 250px;
+            margin-top: 20px;
+        }
+
+        /* --- BÓNG BAY VÀ BÁNH KEM (Đã đổi màu) --- */
+        .balloon {
+            width: 40px; height: 50px; background: #42a5f5; /* Đổi màu bóng bay */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute; bottom: -100px; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+            opacity: 0; animation: float 10s ease-in-out infinite; z-index: 10;
+        }
+        .balloon::before {
+            content: ''; position: absolute; bottom: -10px; left: 50%;
+            transform: translateX(-50%); width: 0; height: 0; border-style: solid;
+            border-width: 0 5px 10px 5px; border-color: transparent transparent var(--balloon-color) transparent;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 0.8; }
+            100% { transform: translateY(-120vh); opacity: 0; }
+        }
+
+        /* Bánh kem CSS Art (Đã đổi màu) */
+        #cake {
+            margin: 40px auto 20px; display: none; width: 250px; height: 200px; position: relative;
+        }
+        .layer { position: absolute; width: 100%; border-radius: 50%; }
+        .bottom { height: 80px; background: #90caf9; top: 120px; box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2); }
+        .middle { height: 60px; background: #e3f2fd; top: 60px; z-index: 1; }
+        .top { height: 40px; background: #64b5f6; top: 20px; z-index: 2; }
+        .icing { height: 20px; background: #ffffff; top: 10px; z-index: 3; border-radius: 50%; }
+        .candle { position: absolute; width: 5px; height: 20px; background: #ffeb3b; top: -10px; left: 50%; transform: translateX(-50%); z-index: 4; border-radius: 2px; } /* Nến vàng */
+        .flame { position: absolute; width: 6px; height: 8px; background: orange; border-radius: 50%; top: -18px; left: 50%; transform: translateX(-50%); z-index: 5; box-shadow: 0 0 5px yellow; }
+        .message { position: absolute; top: 60px; width: 100%; text-align: center; font-weight: bold; color: #0d47a1; font-size: 0.8em; z-index: 5; }
+        /* ĐỔI CHỮ: CHÚC MỪNG SINH NHẬT */
+        #cake .message:after { content: "SINH NHẬT VUI VẺ"; }
+
+
+        /* --- CSS CHỮ RƠI ĐẸP (FALLING TEXT) --- */
+        .falling-text {
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            font-size: 1.5em; /* Kích thước chữ */
+            opacity: 0;
+            color: #ffeb3b; /* Màu chữ vàng */
+            text-shadow: 0 0 5px #0d47a1, 0 0 10px #0d47a1;
+            /* Thêm hiệu ứng xoay và rơi */
+            animation: fall 10s linear infinite; 
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        /* --- KẾT THÚC CSS CHỮ RƠI --- */
+
+    </style>
+</head>
+<body>
+    <audio id="bg-music" loop>
+        <source src="hbbd.mp3" type="audio/mp3">
+        Trình duyệt của bạn không hỗ trợ audio.
+    </audio>
+
+    <div id="music-question">
+        <h2>🥳 Bố yêu, con có thể bật một bản nhạc nền sinh nhật nhẹ nhàng không ạ? 🥳</h2>
+        <button id="btn-yes" class="btn">Yes! 🎶</button>
+        <button id="btn-no" class="btn">No🤫</button>
+    </div>
+
+    <div id="falling-text-area" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
+    </div>
+    
+    <div id="container">
+        <h1 id="main-title">🎂 CHÚC MỪNG SINH NHẬT BỐ - NGƯỜI ĐÀN ÔNG VĨ ĐẠI NHẤT 🎂</h1>
+        
+        <div id="content">
+            <h2 style="color: #0d47a1;">1: Lời Giới Thiệu</h2>
+            <p id="intro-text" style="font-style: italic; font-size: 1.1em;"></p>
+            
+            <h2 style="color: #0d47a1;">2: Bức Thư Tôn Vinh Bố</h2>
+            <div id="letter-box">
+                <p id="typing-letter">Đang soạn lời chúc...</p>
+            </div>
+            
+            <h2 id="final-step" style="color: #0d47a1; margin-top: 30px; display: none;">3: Món Quà Bất Ngờ!</h2>
+
+            <div id="balloon-area" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;">
+            </div>
+
+            <div id="cake">
+                <div class="candle"><div class="flame"></div></div>
+                <div class="icing"></div>
+                <div class="top layer"><div class="message"></div></div> <div class="middle layer"></div>
+                <div class="bottom layer"></div>
+            </div>
+
+            <p id="closing-message" style="font-size: 1.2em; font-weight: bold; margin-top: 30px; display: none; color: #0d47a1;">
+                Con chúc Bố luôn mạnh khỏe, hạnh phúc, và luôn là trụ cột vững chắc của gia đình mình!
+                <br>
+                Con yêu Bố rất nhiều! ❤️
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // SỬA NỘI DUNG THƯ CHO SINH NHẬT BỐ
+        const letterContent = `
+Gửi Bố yêu quý của con!
+
+Hôm nay là một ngày đặc biệt, là sinh nhật của người đàn ông vĩ đại nhất trong cuộc đời con.
+
+Bố luôn là người hùng thầm lặng, là nguồn sức mạnh và là kim chỉ nam cho con. Những lời dạy, sự kiên nhẫn và tình yêu thương vô điều kiện của Bố đã định hình con người con ngày hôm nay.
+
+Cảm ơn Bố vì tất cả những nỗ lực, sự hy sinh và những khoảnh khắc tuyệt vời Bố đã mang lại cho gia đình.
+
+Con kính chúc Bố bước sang tuổi mới với thật nhiều sức khỏe, luôn tươi trẻ và thành công trong mọi dự định. Bố hãy luôn tự hào về bản thân và sống thật vui vẻ nhé!
+
+Chúc Mừng Sinh Nhật Bố!
+
+Con của Bố: Minh Vũ
+`;
+
+        const music = document.getElementById('bg-music');
+        const container = document.getElementById('container');
+        const content = document.getElementById('content');
+        const introText = document.getElementById('intro-text');
+        const typingLetter = document.getElementById('typing-letter');
+        const finalStep = document.getElementById('final-step');
+        const cakeElement = document.getElementById('cake');
+        const closingMessage = document.getElementById('closing-message');
+        const musicQuestion = document.getElementById('music-question');
+        const balloonArea = document.getElementById('balloon-area');
+        const fallingTextArea = document.getElementById('falling-text-area'); // Thêm khu vực chữ rơi
+
+        // Hàm gõ chữ tự động (Giữ nguyên)
+        function typeWriter(text, element, speed) {
+            let i = 0;
+            return new Promise(resolve => {
+                function typing() {
+                    if (i < text.length) {
+                        // Thay thế ký tự xuống dòng bằng <br> trong HTML (nếu cần)
+                        const char = text.charAt(i);
+                        if (char === '\n') {
+                            element.innerHTML += '<br>';
+                        } else {
+                            element.textContent += char;
+                        }
+                        i++;
+                        setTimeout(typing, speed);
+                    } else {
+                        resolve();
+                    }
+                }
+                typing();
+            });
+        }
+        
+        // Hiệu ứng bóng bay (Đã đổi màu)
+        function startBalloonAnimation() {
+            // Đổi màu bóng bay phù hợp với tông màu xanh/vàng
+            const colors = ['#1e88e5', '#42a5f5', '#64b5f6', '#ffeb3b', '#c5e1a5'];
+            
+            for (let i = 0; i < 15; i++) { 
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                
+                const randomLeft = Math.random() * 80 + 10;
+                balloon.style.left = randomLeft + '%';
+                
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.background = color;
+                balloon.style.setProperty('--balloon-color', color);
+                
+                const randomDelay = Math.random() * 5; 
+                balloon.style.animationDelay = randomDelay + 's';
+                
+                balloonArea.appendChild(balloon);
+            }
+        }
+
+
+        // --- THÊM HÀM CHỮ RƠI ĐẸP ---
+        function startFallingText() {
+            const messages = ["🎂", "Chúc Mừng", "Sinh Nhật", "Bố Yêu", "🎉", "❤️", "Bố", "Vui Vẻ"];
+            const colors = ['#ffeb3b', '#ffc107', '#ff9800']; // Màu vàng/cam
+            
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count >= 50) { // Giới hạn số lượng chữ rơi
+                    clearInterval(interval);
+                    return;
+                }
+                
+                const text = document.createElement('span');
+                text.className = 'falling-text';
+                
+                // Chọn ngẫu nhiên một thông điệp
+                text.textContent = messages[Math.floor(Math.random() * messages.length)];
+                
+                // Vị trí ngẫu nhiên
+                text.style.left = Math.random() * 90 + 5 + '%';
+                
+                // Độ trễ ngẫu nhiên
+                text.style.animationDelay = -Math.random() * 10 + 's';
+                
+                // Tốc độ ngẫu nhiên
+                text.style.animationDuration = Math.random() * 5 + 5 + 's'; 
+
+                // Màu ngẫu nhiên
+                text.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Kích thước ngẫu nhiên
+                text.style.fontSize = Math.random() * 1.5 + 1 + 'em'; 
+
+                fallingTextArea.appendChild(text);
+                
+                // Xóa chữ khi rơi xong để không làm nặng trình duyệt
+                text.addEventListener('animationend', () => {
+                    text.remove();
+                });
+
+                count++;
+            }, 500); // Tạo một chữ mỗi 0.5 giây
+        }
+        // --- KẾT THÚC HÀM CHỮ RƠI ---
+
+
+        // BẮT ĐẦU CHƯƠNG TRÌNH CHÍNH (Đã tích hợp hàm chữ rơi)
+        function startGift(playMusic) {
+            // Ẩn câu hỏi và hiện nội dung chính
+            musicQuestion.style.display = 'none';
+            container.style.opacity = '1';
+            content.style.display = 'block';
+
+            // Khởi động hiệu ứng chữ rơi ngay lập tức
+            startFallingText();
+
+            // 1. PHÁT NHẠC & GIỚI THIỆU
+            let intro = "";
+            if (playMusic) {
+                try {
+                    music.play(); 
+                } catch (e) {
+                    console.error("Không thể phát nhạc 'hbbd.mp3'. Hãy kiểm tra tên file và đường dẫn.");
+                }
+                intro = "🔊 Tuyệt vời! Con xin gửi đến Bố một bản nhạc sinh nhật nhẹ nhàng...";
+            } else {
+                intro = "🤫 Dạ vâng! Con hiểu rồi, để dành sự bất ngờ. Chào mừng Bố đến với món quà sinh nhật nhỏ này!";
+            }
+
+            typeWriter(intro, introText, 50)
+            .then(() => {
+                typingLetter.textContent = ''; 
+                // Tăng thời gian chờ để kịp đọc phần intro
+                return new Promise(resolve => setTimeout(resolve, 1500)); 
+            })
+            // 2. GÕ THƯ TẶNG BỐ TỰ ĐỘNG
+            .then(() => typeWriter(letterContent, typingLetter, 25))
+            .then(() => {
+                // Tăng thời gian chờ để đọc thư
+                return new Promise(resolve => setTimeout(resolve, 3000)); 
+            })
+            // 3. HIỆU ỨNG CUỐI: BÓNG BAY & BÁNH KEM
+            .then(() => {
+                finalStep.textContent = "3: BÓNG BAY VÀ BÁNH KEM CHÚC MỪNG SINH NHẬT!";
+                finalStep.style.display = 'block';
+                
+                // Thả bóng bay
+                startBalloonAnimation();
+
+                // Hiện bánh kem
+                cakeElement.style.display = 'block';
+                
+                // Lời nhắn cuối
+                closingMessage.style.display = 'block';
+            });
+        }
+
+        // --- SỰ KIỆN TƯƠNG TÁC ---
+        document.getElementById('btn-yes').addEventListener('click', () => {
+            startGift(true);
+        });
+
+        document.getElementById('btn-no').addEventListener('click', () => {
+            startGift(false);
+        });
+
+    </script>
+</body>
+</html>
